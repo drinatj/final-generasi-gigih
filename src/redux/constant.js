@@ -1,0 +1,1 @@
+export const GET_NEW_ALBUM = "GET_NEW_ALBUM";

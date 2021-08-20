@@ -1,60 +1,28 @@
-import React, {useState, useEffect} from 'react';
-import { authEndpoint, clientId, redirectUri, scopes } from "./components/config";
+import React, {useState} from 'react';
 import axios from 'axios';
-import './App.css';
-import AlbumSort from './components/sortAlbum/index';
-import TransitionsModal from './modalCreatePlaylist';
-import { useStyles } from './components/material-ui';
-import Paper from '@material-ui/core/Paper';
-import InputBase from '@material-ui/core/InputBase';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import SearchIcon from '@material-ui/icons/Search'
+import '../App.css';
+import AlbumSort from './sortAlbum/index';
+import TransitionsModal from '../modalCreatePlaylist/index';
+import { useSelector } from 'react-redux';
 
-function App() {
+
+function Home() {
+  const {accessTokenBearer} = useSelector((state) => state.token)
   
-  const [accessToken, setAccessToken] = useState()
   const [searchKeyword, setSearchKeyword] = useState()
   const [trackData, setTrackData] = useState()
-  const [isAuthentic, setAuthentic] = useState(false)
   const [selectedTrack, setSelectedTrack] = useState([])
-  const classes = useStyles();
 
-  const getParamsFromUrl = (hash) => {
-    const stringAfterHashtag = hash.substring(1)
-    const paramsInUrl = stringAfterHashtag.split("&")
-    const paramsSplitUp = paramsInUrl.reduce((acc, currentVal) => {
-      const [key, value] = currentVal.split("=")
-      acc[key] = value
-      return acc
-    }, {})
-    return paramsSplitUp
-  }
-
-  const handleLogin = () => {
-    window.location = `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&response_type=token&show_dialog=true`;
-  }
-
-
+  
   //cek dah masuk apa belom
   const renderAuthenticBtn = () => {
-    if (isAuthentic){
-      return (
+    return (
         <div >
           <div className="navBar">
             <h1 className="navBrand">Moosick</h1>
             <div className="searchContainer">
-              <Paper component="form" className={classes.root}>
-                <InputBase
-                  onChange={handleSetSearchKey} 
-                  className={classes.input}
-                  placeholder="Search"
-                />
-                <Divider className={classes.divider} orientation="vertical" />
-                <IconButton type="submit" className={classes.iconButton} aria-label="search" onClick={handleSearchPlaylist}>
-                  <SearchIcon />
-                </IconButton>
-              </Paper>
+              <input  onChange={handleSetSearchKey} />
+              <button type="submit" onClick={handleSearchPlaylist}>submit</button>
             </div>
           </div>
           <ul>
@@ -65,15 +33,6 @@ function App() {
           </ul>
         </div>
       )
-    }
-    else{
-      return(
-        <div className="login">
-          <h2>Moosick</h2>
-          <button type="submit" className={classes.buttonLogin} onClick={handleLogin}>login</button>
-        </div>
-      )
-    }
   }
 
   const handleKeySpace = (keyword) => {
@@ -88,7 +47,7 @@ function App() {
   const handleSearchPlaylist = async () => {
     await axios.get("https://api.spotify.com/v1/search", {
       headers: {
-        'Authorization' : `Bearer ${accessToken}`,
+        'Authorization' : `Bearer ${accessTokenBearer}`,
         "Accept": "application/json",
         "Content-Type": "application/json",
       },
@@ -117,8 +76,7 @@ function App() {
   }
 
   const renderShowTracksPage = () => {
-    if (isAuthentic){
-      let renderShowPage = (
+    let renderShowPage = (
         <div>
           <div>
             <div className="cont-lagu">
@@ -139,19 +97,7 @@ function App() {
         </div>
       )
       return renderShowPage
-    }
   }
-
-  //ambil token
-  useEffect(() => {
-    if (window.location.hash) {
-      const {access_token} = getParamsFromUrl(window.location.hash)
-      setAccessToken(access_token)
-    }
-    if (accessToken){
-      setAuthentic(true)
-    }
-  }, [accessToken])
 
   return (
     <div className="App">
@@ -161,4 +107,4 @@ function App() {
   );
 }
 
-export default App;
+export default Home;
