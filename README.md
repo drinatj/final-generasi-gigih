@@ -2,9 +2,9 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-##Problem Description
+## Problem Description
 
-##Features
+## Features
 Search music and create playlist with Spotify API
 
 ## Available Scripts
